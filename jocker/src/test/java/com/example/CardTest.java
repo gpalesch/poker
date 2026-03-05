@@ -107,4 +107,21 @@ public class CardTest {
         assertThat(result.getCategory()).isEqualTo(HandCategory.STRAIGHT);
         assertThat(result.getChosen5()).extracting(Card::getRank).containsExactly("9", "8", "7", "6", "5");
     }
+
+    @Test
+    void identifyFlush() {
+        List<Card> availableCards = List.of(
+            new Card("2", "Hearts"),
+            new Card("6", "Hearts"),
+            new Card("7", "Hearts"),
+            new Card("8", "Hearts"),
+            new Card("9", "Hearts"),
+            new Card("King", "Clubs"),
+            new Card("3", "Spades")
+        );
+
+        HandResult result = HandEvaluator.evaluateBestHand(availableCards);
+        assertThat(result.getCategory()).isEqualTo(HandCategory.FLUSH);
+        assertThat(result.getChosen5()).extracting(Card::getRank).containsExactly("9", "8", "7", "6", "2");
+    }
 }

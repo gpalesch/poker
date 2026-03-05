@@ -14,6 +14,22 @@ public class HandEvaluator {
         Map<String, List<Card>> cardsByRank = availableCards.stream()
             .collect(Collectors.groupingBy(Card::getRank));
 
+    
+        // Check for flush
+        Map<String, List<Card>> cardsBySuit = availableCards.stream()
+            .collect(Collectors.groupingBy(Card::getSuit));
+        
+        List<Card> flush = cardsBySuit.values().stream()
+            .filter(cards -> cards.size() >= 5)
+            .flatMap(List::stream)
+            .sorted(Comparator.comparingInt(Card::getNumericValue).reversed())
+            .limit(5)
+            .collect(Collectors.toList());
+        
+        if (!flush.isEmpty()) {
+            return new HandResult(HandCategory.FLUSH, flush);
+        }
+
         // Check for straight
         List<Integer> uniqueValues = availableCards.stream()
             .map(Card::getNumericValue)
