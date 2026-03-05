@@ -39,4 +39,21 @@ public class CardTest {
         assertThat(result.getCategory()).isEqualTo(HandCategory.HIGH_CARD);
         assertThat(result.getChosen5()).extracting(Card::getRank).containsExactly("Ace", "King", "Jack", "10", "7");
     }
+
+    @Test
+    void identifyOnePair() {
+        List<Card> availableCards = List.of(
+            new Card("2", "Clubs"),
+            new Card("10", "Hearts"),
+            new Card("Ace", "Spades"),
+            new Card("King", "Diamonds"),
+            new Card("3", "Hearts"),
+            new Card("Jack", "Clubs"),
+            new Card("10", "Spades")
+        );
+
+        HandResult result = HandEvaluator.evaluateBestHand(availableCards);
+        assertThat(result.getCategory()).isEqualTo(HandCategory.ONE_PAIR);
+        assertThat(result.getChosen5()).extracting(Card::getRank).containsExactly("10", "10", "Ace", "King", "Jack");
+    }
 }
