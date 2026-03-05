@@ -13,6 +13,39 @@ public class HandEvaluator {
         
         Map<String, List<Card>> cardsByRank = availableCards.stream()
             .collect(Collectors.groupingBy(Card::getRank));
+        
+        Map<String, List<Card>> cardsBySuit = availableCards.stream()
+            .collect(Collectors.groupingBy(Card::getSuit));
+
+        // Check for straight flush
+        for (List<Card> suitCards : cardsBySuit.values()) {
+            if (suitCards.size() >= 5) {
+                List<Integer> suitValues = suitCards.stream()
+                    .map(Card::getNumericValue)
+                    .distinct()
+                    .sorted()
+                    .collect(Collectors.toList());
+                
+                for (int i = 0; i <= suitValues.size() - 5; i++) {
+                    boolean isStraight = true;
+                    for (int j = 0; j < 4; j++) {
+                        if (suitValues.get(i + j + 1) != suitValues.get(i + j) + 1) {
+                            isStraight = false;
+                            break;
+                        }
+                    }
+                    if (isStraight) {
+                        final int straightIndex = i;
+                        List<Card> straightFlush = suitCards.stream()
+                            .filter(card -> suitValues.subList(straightIndex, straightIndex + 5).contains(card.getNumericValue()))
+                            .sorted(Comparator.comparingInt(Card::getNumericValue).reversed())
+                            .collect(Collectors.toList());
+                        
+                        return new HandResult(HandCategory.ROYAL_FLUSH, straightFlush);
+                    }
+                }
+            }
+        }
 
         // Check for four of a kind
         List<Card> fourOfAKind = cardsByRank.values().stream()
@@ -50,8 +83,6 @@ public class HandEvaluator {
         }
     
         // Check for flush
-        Map<String, List<Card>> cardsBySuit = availableCards.stream()
-            .collect(Collectors.groupingBy(Card::getSuit));
         
         List<Card> flush = cardsBySuit.values().stream()
             .filter(cards -> cards.size() >= 5)

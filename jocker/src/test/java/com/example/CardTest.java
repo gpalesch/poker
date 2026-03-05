@@ -158,4 +158,21 @@ public class CardTest {
         assertThat(result.getCategory()).isEqualTo(HandCategory.FOUR_OF_A_KIND);
         assertThat(result.getChosen5()).extracting(Card::getRank).containsExactly("Queen", "Queen", "Queen", "Queen", "Ace");
     }
+
+    @Test
+    void identifyStraightFlush() {
+        List<Card> availableCards = List.of(
+            new Card("5", "Clubs"),
+            new Card("6", "Clubs"),
+            new Card("7", "Clubs"),
+            new Card("8", "Clubs"),
+            new Card("9", "Clubs"),
+            new Card("King", "Hearts"),
+            new Card("3", "Spades")
+        );
+
+        HandResult result = HandEvaluator.evaluateBestHand(availableCards);
+        assertThat(result.getCategory()).isEqualTo(HandCategory.ROYAL_FLUSH);
+        assertThat(result.getChosen5()).extracting(Card::getRank).containsExactly("9", "8", "7", "6", "5");
+    }
 }
