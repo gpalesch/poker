@@ -102,6 +102,22 @@ public class HandEvaluator {
             .sorted()
             .collect(Collectors.toList());
         
+        List<Integer> wheelValues = List.of(2, 3, 4, 5, 14);
+        boolean isWheel = uniqueValues.containsAll(wheelValues);
+        if (isWheel) {
+            List<Card> wheelCards = availableCards.stream()
+                .filter(card -> wheelValues.contains(card.getNumericValue()))
+                .sorted((c1, c2) -> {
+                    if (c1.getNumericValue() == 14 && c2.getNumericValue() != 14) return 1;
+                    if (c1.getNumericValue() != 14 && c2.getNumericValue() == 14) return -1;
+                    return Integer.compare(c2.getNumericValue(), c1.getNumericValue());
+                })
+                .limit(5)
+                .collect(Collectors.toList());
+            
+            return new HandResult(HandCategory.STRAIGHT, wheelCards);
+        }
+        
         for (int i = 0; i <= uniqueValues.size() - 5; i++) {
             boolean isStraight = true;
             for (int j = 0; j < 4; j++) {

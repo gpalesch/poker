@@ -172,8 +172,42 @@ public class CardTest {
         );
 
         HandResult result = HandEvaluator.evaluateBestHand(availableCards);
-        assertThat(result.getCategory()).isEqualTo(HandCategory.ROYAL_FLUSH);
+        assertThat(result.getCategory()).isEqualTo(HandCategory.STRAIGHT_FLUSH);
         assertThat(result.getChosen5()).extracting(Card::getRank).containsExactly("9", "8", "7", "6", "5");
+    }
+
+    @Test
+    void identifyAceLowStraightWheel() {
+        List<Card> availableCards = List.of(
+            new Card("Ace", "Clubs"),
+            new Card("2", "Diamonds"),
+            new Card("3", "Hearts"),
+            new Card("4", "Spades"),
+            new Card("5", "Clubs"),
+            new Card("King", "Hearts"),
+            new Card("Queen", "Spades")
+        );
+
+        HandResult result = HandEvaluator.evaluateBestHand(availableCards);
+        assertThat(result.getCategory()).isEqualTo(HandCategory.STRAIGHT);
+        assertThat(result.getChosen5()).extracting(Card::getRank).containsExactly("5", "4", "3", "2", "Ace");
+    }
+
+    @Test
+    void identifyBoardPlays() {
+        List<Card> availableCards = List.of(
+            new Card("Ace", "Hearts"),
+            new Card("King", "Diamonds"),
+            new Card("Queen", "Clubs"),
+            new Card("Jack", "Spades"),
+            new Card("10", "Hearts"),
+            new Card("2", "Clubs"),
+            new Card("3", "Diamonds")
+        );
+
+        HandResult result = HandEvaluator.evaluateBestHand(availableCards);
+        assertThat(result.getCategory()).isEqualTo(HandCategory.HIGH_CARD);
+        assertThat(result.getChosen5()).extracting(Card::getRank).containsExactly("Ace", "King", "Queen", "Jack", "10");
     }
 
     @Test
@@ -277,5 +311,58 @@ public class CardTest {
         
         int comparison = HandComparator.compareHands(result1, result2);
         assertThat(comparison).isGreaterThan(0);
+    }
+
+    @Test
+    void findWinnerSinglePlayer() {
+        List<Card> board = List.of(
+            new Card("Ace", "Hearts"),
+            new Card("King", "Diamonds"),
+            new Card("Queen", "Clubs"),
+            new Card("Jack", "Spades"),
+            new Card("10", "Hearts")
+        );
+        
+        Player player1 = new Player("Alice", new Card("9", "Clubs"), new Card("8", "Diamonds"));
+        List<Player> players = List.of(player1);
+        
+        List<String> winners = PokerGame.findWinners(players, board);
+        assertThat(winners).containsExactly("Alice");
+    }
+
+    @Test
+    void findWinnerMultiplePlayers() {
+        List<Card> board = List.of(
+            new Card("King", "Hearts"),
+            new Card("King", "Diamonds"),
+            new Card("5", "Clubs"),
+            new Card("3", "Spades"),
+            new Card("2", "Hearts")
+        );
+        
+        Player player1 = new Player("Alice", new Card("King", "Clubs"), new Card("10", "Diamonds"));
+        Player player2 = new Player("Bob", new Card("Queen", "Clubs"), new Card("Jack", "Diamonds"));
+        List<Player> players = List.of(player1, player2);
+        
+        List<String> winners = PokerGame.findWinners(players, board);
+        assertThat(winners).containsExactly("Alice");
+    }
+
+    @Test
+    void findWinnerSplit() {
+        List<Card> board = List.of(
+            new Card("Ace", "Hearts"),
+            new Card("King", "Diamonds"),
+            new Card("Queen", "Clubs"),
+            new Card("Jack", "Spades"),
+            new Card("10", "Hearts")
+        );
+        
+        Player player1 = new Player("Alice", new Card("9", "Clubs"), new Card("8", "Diamonds"));
+        Player player2 = new Player("Bob", new Card("2", "Clubs"), new Card("3", "Diamonds"));
+        List<Player> players = List.of(player1, player2);
+        
+        List<String> winners = PokerGame.findWinners(players, board);
+        assertThat(winners).containsExactly("Alice", "Bob");
     }
 }
