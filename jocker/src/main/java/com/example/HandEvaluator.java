@@ -14,6 +14,23 @@ public class HandEvaluator {
         Map<String, List<Card>> cardsByRank = availableCards.stream()
             .collect(Collectors.groupingBy(Card::getRank));
 
+        // Check for four of a kind
+        List<Card> fourOfAKind = cardsByRank.values().stream()
+            .filter(cards -> cards.size() == 4)
+            .flatMap(List::stream)
+            .collect(Collectors.toList());
+        
+        if (!fourOfAKind.isEmpty()) {
+            List<Card> remaining = sortedCards.stream()
+                .filter(card -> !fourOfAKind.contains(card))
+                .limit(1)
+                .collect(Collectors.toList());
+            
+            List<Card> chosen5 = new java.util.ArrayList<>(fourOfAKind);
+            chosen5.addAll(remaining);
+            
+            return new HandResult(HandCategory.FOUR_OF_A_KIND, chosen5);
+        }
 
         // Check for full house
         List<Card> threeOfAKindForFullHouse = cardsByRank.values().stream()
