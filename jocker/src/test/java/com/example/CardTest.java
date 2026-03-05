@@ -90,4 +90,21 @@ public class CardTest {
         assertThat(result.getCategory()).isEqualTo(HandCategory.THREE_OF_A_KIND);
         assertThat(result.getChosen5()).extracting(Card::getRank).containsExactly("8", "8", "8", "Ace", "King");
     }
+
+    @Test
+    void identifyStraight() {
+        List<Card> availableCards = List.of(
+            new Card("5", "Clubs"),
+            new Card("6", "Spades"),
+            new Card("7", "Hearts"),
+            new Card("8", "Spades"),
+            new Card("9", "Diamonds"),
+            new Card("King", "Clubs"),
+            new Card("3", "Hearts")
+        );
+
+        HandResult result = HandEvaluator.evaluateBestHand(availableCards);
+        assertThat(result.getCategory()).isEqualTo(HandCategory.STRAIGHT);
+        assertThat(result.getChosen5()).extracting(Card::getRank).containsExactly("9", "8", "7", "6", "5");
+    }
 }

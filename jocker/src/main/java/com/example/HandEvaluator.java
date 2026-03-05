@@ -13,6 +13,33 @@ public class HandEvaluator {
         
         Map<String, List<Card>> cardsByRank = availableCards.stream()
             .collect(Collectors.groupingBy(Card::getRank));
+
+        // Check for straight
+        List<Integer> uniqueValues = availableCards.stream()
+            .map(Card::getNumericValue)
+            .distinct()
+            .sorted()
+            .collect(Collectors.toList());
+        
+        for (int i = 0; i <= uniqueValues.size() - 5; i++) {
+            boolean isStraight = true;
+            for (int j = 0; j < 4; j++) {
+                if (uniqueValues.get(i + j + 1) != uniqueValues.get(i + j) + 1) {
+                    isStraight = false;
+                    break;
+                }
+            }
+            if (isStraight) {
+                final int straightIndex = i;
+                List<Card> straightCards = availableCards.stream()
+                    .filter(card -> uniqueValues.subList(straightIndex, straightIndex + 5).contains(card.getNumericValue()))
+                    .sorted(Comparator.comparingInt(Card::getNumericValue).reversed())
+                    .limit(5)
+                    .collect(Collectors.toList());
+                
+                return new HandResult(HandCategory.STRAIGHT, straightCards);
+            }
+        }
         
         // Check for three of a kind
         List<Card> threeOfAKind = cardsByRank.values().stream()
@@ -31,6 +58,7 @@ public class HandEvaluator {
             
             return new HandResult(HandCategory.THREE_OF_A_KIND, chosen5);
         }
+        
         
         // Check for two pairs
         List<List<Card>> pairs = cardsByRank.values().stream()
