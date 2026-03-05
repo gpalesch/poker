@@ -14,6 +14,24 @@ public class HandEvaluator {
         Map<String, List<Card>> cardsByRank = availableCards.stream()
             .collect(Collectors.groupingBy(Card::getRank));
         
+        // Check for three of a kind
+        List<Card> threeOfAKind = cardsByRank.values().stream()
+            .filter(cards -> cards.size() == 3)
+            .flatMap(List::stream)
+            .collect(Collectors.toList());
+        
+        if (!threeOfAKind.isEmpty()) {
+            List<Card> remaining = sortedCards.stream()
+                .filter(card -> !threeOfAKind.contains(card))
+                .limit(2)
+                .collect(Collectors.toList());
+            
+            List<Card> chosen5 = new java.util.ArrayList<>(threeOfAKind);
+            chosen5.addAll(remaining);
+            
+            return new HandResult(HandCategory.THREE_OF_A_KIND, chosen5);
+        }
+        
         // Check for two pairs
         List<List<Card>> pairs = cardsByRank.values().stream()
             .filter(cards -> cards.size() == 2)
