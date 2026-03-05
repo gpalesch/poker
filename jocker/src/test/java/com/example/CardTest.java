@@ -124,4 +124,21 @@ public class CardTest {
         assertThat(result.getCategory()).isEqualTo(HandCategory.FLUSH);
         assertThat(result.getChosen5()).extracting(Card::getRank).containsExactly("9", "8", "7", "6", "2");
     }
+
+    @Test
+    void identifyFullHouse() {
+        List<Card> availableCards = List.of(
+            new Card("King", "Hearts"),
+            new Card("King", "Spades"),
+            new Card("King", "Diamonds"),
+            new Card("Ace", "Spades"),
+            new Card("Ace", "Clubs"),
+            new Card("Queen", "Clubs"),
+            new Card("3", "Hearts")
+        );
+
+        HandResult result = HandEvaluator.evaluateBestHand(availableCards);
+        assertThat(result.getCategory()).isEqualTo(HandCategory.FULL_HOUSE);
+        assertThat(result.getChosen5()).extracting(Card::getRank).containsExactly("King", "King", "King", "Ace", "Ace");
+    }
 }

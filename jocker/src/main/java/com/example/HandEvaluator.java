@@ -14,6 +14,23 @@ public class HandEvaluator {
         Map<String, List<Card>> cardsByRank = availableCards.stream()
             .collect(Collectors.groupingBy(Card::getRank));
 
+
+        // Check for full house
+        List<Card> threeOfAKindForFullHouse = cardsByRank.values().stream()
+            .filter(cards -> cards.size() == 3)
+            .flatMap(List::stream)
+            .collect(Collectors.toList());
+        
+        List<Card> pairForFullHouse = cardsByRank.values().stream()
+            .filter(cards -> cards.size() >= 2 && !threeOfAKindForFullHouse.containsAll(cards))
+            .flatMap(List::stream)
+            .collect(Collectors.toList());
+        
+        if (!threeOfAKindForFullHouse.isEmpty() && !pairForFullHouse.isEmpty()) {
+            List<Card> fullHouse = new java.util.ArrayList<>(threeOfAKindForFullHouse);
+            fullHouse.addAll(pairForFullHouse.stream().limit(2).collect(Collectors.toList()));
+            return new HandResult(HandCategory.FULL_HOUSE, fullHouse);
+        }
     
         // Check for flush
         Map<String, List<Card>> cardsBySuit = availableCards.stream()
