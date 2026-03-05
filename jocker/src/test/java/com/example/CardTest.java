@@ -11,4 +11,12 @@ public class CardTest {
         assertThat(card.getSuit()).isEqualTo("Spades");
     }
     
+    @Test
+    void cardNumericValue() {
+        Card ace = new Card("Ace", "Hearts");
+        Card ten = new Card("10", "Diamonds");
+
+        assertThat(ace.getNumericValue()).isEqualTo(14);
+        assertThat(ten.getNumericValue()).isEqualTo(10);
+    }
 }
