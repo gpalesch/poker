@@ -175,4 +175,107 @@ public class CardTest {
         assertThat(result.getCategory()).isEqualTo(HandCategory.ROYAL_FLUSH);
         assertThat(result.getChosen5()).extracting(Card::getRank).containsExactly("9", "8", "7", "6", "5");
     }
+
+    @Test
+    void tieBreakTwoPairHigherPair() {
+        List<Card> hand1 = List.of(
+            new Card("King", "Hearts"),
+            new Card("King", "Spades"),
+            new Card("5", "Diamonds"),
+            new Card("5", "Clubs"),
+            new Card("Ace", "Hearts")
+        );
+        
+        List<Card> hand2 = List.of(
+            new Card("Queen", "Hearts"),
+            new Card("Queen", "Spades"),
+            new Card("5", "Diamonds"),
+            new Card("5", "Clubs"),
+            new Card("Ace", "Hearts")
+        );
+        
+        HandResult result1 = new HandResult(HandCategory.TWO_PAIR, hand1);
+        HandResult result2 = new HandResult(HandCategory.TWO_PAIR, hand2);
+        
+        int comparison = HandComparator.compareHands(result1, result2);
+        assertThat(comparison).isGreaterThan(0);
+    }
+
+    @Test
+    void tieBreakOnePairKickers() {
+        List<Card> hand1 = List.of(
+            new Card("10", "Hearts"),
+            new Card("10", "Spades"),
+            new Card("Ace", "Diamonds"),
+            new Card("King", "Clubs"),
+            new Card("Queen", "Hearts")
+        );
+        
+        List<Card> hand2 = List.of(
+            new Card("10", "Hearts"),
+            new Card("10", "Diamonds"),
+            new Card("Ace", "Spades"),
+            new Card("King", "Hearts"),
+            new Card("Jack", "Clubs")
+        );
+        
+        HandResult result1 = new HandResult(HandCategory.ONE_PAIR, hand1);
+        HandResult result2 = new HandResult(HandCategory.ONE_PAIR, hand2);
+        
+        int comparison = HandComparator.compareHands(result1, result2);
+        assertThat(comparison).isGreaterThan(0);
+    }
+
+    @Test
+    void tieBreakSplit() {
+        List<Card> hand1 = List.of(
+            new Card("Ace", "Hearts"),
+            new Card("King", "Spades"),
+            new Card("Queen", "Diamonds"),
+            new Card("Jack", "Clubs"),
+            new Card("10", "Hearts")
+        );
+        
+        List<Card> hand2 = List.of(
+            new Card("Ace", "Diamonds"),
+            new Card("King", "Clubs"),
+            new Card("Queen", "Hearts"),
+            new Card("Jack", "Spades"),
+            new Card("10", "Diamonds")
+        );
+        
+        HandResult result1 = new HandResult(HandCategory.HIGH_CARD, hand1);
+        HandResult result2 = new HandResult(HandCategory.HIGH_CARD, hand2);
+        
+        boolean isSplit = HandComparator.isSplit(result1, result2);
+        assertThat(isSplit).isTrue();
+        
+        int comparison = HandComparator.compareHands(result1, result2);
+        assertThat(comparison).isEqualTo(0);
+    }
+
+    @Test
+    void tieBreakDifferentCategories() {
+        List<Card> hand1 = List.of(
+            new Card("King", "Hearts"),
+            new Card("King", "Spades"),
+            new Card("King", "Diamonds"),
+            new Card("Queen", "Clubs"),
+            new Card("Jack", "Hearts")
+        );
+        
+        List<Card> hand2 = List.of(
+            new Card("10", "Hearts"),
+            new Card("9", "Spades"),
+            new Card("8", "Diamonds"),
+            new Card("7", "Clubs"),
+            new Card("6", "Hearts")
+        );
+        
+        HandResult result1 = new HandResult(HandCategory.THREE_OF_A_KIND, hand1);
+        HandResult result2 = new HandResult(HandCategory.STRAIGHT, hand2);
+        
+        int comparison = HandComparator.compareHands(result1, result2);
+        assertThat(comparison).isGreaterThan(0);
+    }
 }
