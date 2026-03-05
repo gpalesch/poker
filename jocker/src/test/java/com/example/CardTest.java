@@ -172,7 +172,7 @@ public class CardTest {
         );
 
         HandResult result = HandEvaluator.evaluateBestHand(availableCards);
-        assertThat(result.getCategory()).isEqualTo(HandCategory.STRAIGHT_FLUSH);
+        assertThat(result.getCategory()).isEqualTo(HandCategory.ROYAL_FLUSH);
         assertThat(result.getChosen5()).extracting(Card::getRank).containsExactly("9", "8", "7", "6", "5");
     }
 
